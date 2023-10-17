@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gối ngủ thông minh</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+</head>
+
+<body>
+  <div class="container px-4">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom bcc-purle rounded">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32">
+          <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-4 bcc-purle fw-bolder fs-2">Thiết bị giám sát chất lượng giấc ngủ</span>
+      </a>
+    </header>
+    <div class="row g-5 mt-4 py-2 gap-1">
+      <div class="col rounded bg-lightRed">
+        <div class="row p-3">
+          <div class="col rounded text-center p-1 bg-lightRed2">
+            <div class="h2">Nhiệt độ</div>
+            <div id="temp" class="h1">25</div>
+            <div>(độ C)</div>
+            <div id="temp_assessment">Good</div>
+          </div>
+          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="tempChart"> </canvas></div>
+        </div>
+      </div>
+      <div class="col rounded bg-lightGreen">
+        <div class="row p-3">
+          <div class="col rounded text-center p-1 bg-lightGreen2">
+            <div class="h2">Độ ẩm</div>
+            <div id="humi" class="h1">50</div>
+            <div>(%)</div>
+            <div id="humi_assessment">Good</div>
+          </div>
+          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="humiChart"> </canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-5  py-2 gap-1">
+      <div class="col rounded bg-lightBlue">
+        <div class="row p-3">
+          <div class="col rounded text-center p-1 bg-lightBlue2">
+            <div class="h2">CO2</div>
+            <div id="co2" class="h1">1</div>
+            <div>(ppm)</div>
+            <div id="co2_assessment">Good</div>
+          </div>
+          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="co2Chart"> </canvas></div>
+        </div>
+      </div>
+      <div class="col rounded bg-lightYellow">
+        <div class="row p-3">
+          <div class="col rounded text-center p-1 bg-lightYellow2">
+            <div class="h2">Gas</div>
+            <div id="gas" class="h1">0.4</div>
+            <div>(ppm)</div>
+            <div id="gas_assessment">Good</div>
+          </div>
+          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="gasChart"> </canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4 text-center row">
+    <div class="col">
+      <table class="table table-sm table-success table-striped table-hover  table" style="margin: auto;">
+        <caption class=" caption-top">Theo dõi chất lượng giấc ngủ</caption>
+        <thead>
+          <tr>
+            <th scope="col">Sleep time</th>
+            <th scope="col">Turn left - time (s)</th>
+            <th scope="col">Straight - time (s)</th>
+            <th scope="col">Turn right - time (s)</th>
+            <th scope="col">Wake up time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>22:00</th>
+            <td>10800</td>
+            <td>14400</td>
+            <td>3600</td>
+            <td>6:00</td>
+          </tr>
+          <tr>
+            <th>23:00</th>
+            <td>9000</td>
+            <td>3600</td>
+            <td>12,600</td>
+            <td>6:00</td>
+          </tr>
+          <tr>
+            <th>22:30</th>
+            <td>7200</td>
+            <td>7200</td>
+            <td>14400</td>
+            <td>6:30</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+    crossorigin="anonymous"></script>
+
+  <!-- socket -->
+  <script src="../socket.io/socket.io.js"></script>
+  <script>
+    const temp = document.getElementById("temp");
+    const humi = document.getElementById("humi");
+    // const dust = document.getElementById("dust");
+    const co2 = document.getElementById("co2");
+    const gas = document.getElementById("gas");
+
+    var socket = io();
+    socket.on('connect', function () {
+      console.log('Connected!');
+    });
+
+    socket.on("/web/envir", (data) => {
+      temp.innerText = `${data.temp} độ C`;
+      humi.innerText = `${data.humi} %`;
+      // dust.innerText = `${data.nhietdo} ppm`;
+      co2.innerText = `${data.co2} ppm`;
+      gas.innerText = `${data.gas} ppm`;
+      addData(tempChart, data.temp);
+      addData(humiChart, data.humi);
+      addData(gasChart, data.gas);
+      addData(co2Chart, data.co2);
+      if (tempChart.data.datasets[0].data.length > 30) removeData(tempChart);
+      if (humiChart.data.datasets[0].data.length > 30)
+        removeData(humiChart);
+      if (gasChart.data.datasets[0].data.length > 30) removeData(gasChart);
+      if (co2Chart.data.datasets[0].data.length > 30) removeData(co2Chart);
+    });
+
+    socket.on("/web/sleep", (msg) => {
+      console.log(msg);
+      getData();
+    });
+
+    function getData() {
+      cleanTable();
+      showLoading();
+      cleanTable();
+      fetch("/chartData")
+        .then((res) => res.json())
+        .then(res => {
+          if (res.msg != "error") {
+            console.log(res);
+            let data = res.data
+            data.forEach(e => {
+              let state;
+              let timeArray = [];
+              state = e.split(";")
+              let sleepTime = {
+                left: 0, right: 0, straight: 0
+              }
+              state.forEach(eState => {
+                let compoment = eState.split(",")
+                let time = compoment.slice(3, 5).join(":")
+                timeArray.push(time)
+                if (compoment[6] == "1") sleepTime.left += parseInt(compoment[7])
+                if (compoment[6] == "2") sleepTime.straight += parseInt(compoment[7])
+                if (compoment[6] == "3") sleepTime.right += parseInt(compoment[7])
+
+              })
+              // console.log(timeArray);
+              if (timeArray[timeArray.length - 1] == "") timeArray[timeArray.length - 1] = timeArray[timeArray.length - 2]
+              addDateToTable(timeArray[0], sleepTime.left, sleepTime.straight, sleepTime.right, timeArray[timeArray.length - 1])
+              // timeArray[0] se la thoi gian bat dau ngu
+              // timeArray[timeArray.length - 1] se la thoi gian ket thuc ngu (hoac - 2)
+            })
+          } else return false;
+        })
+        return true;
+    }
+
+    function showLoading() {
+      let tbody = document.querySelector('table tbody');
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div></td></tr>`
+    }
+
+
+    function cleanTable() {
+      let tbody = document.querySelector('table tbody');
+      tbody.innerHTML = ""
+    }
+
+    function addDateToTable(data2, data3, data4, data5, data6) {
+      // Get the tbody element
+      let tbody = document.querySelector('table tbody');
+
+      // Create a new row
+      let newRow = document.createElement('tr');
+
+      // Create the cells for the new row
+      let cell2 = document.createElement('td');
+      let cell3 = document.createElement('td');
+      let cell4 = document.createElement('td');
+      let cell5 = document.createElement('td');
+      let cell6 = document.createElement('td');
+
+      // Set the values for the new row
+      cell2.textContent = data2;
+      cell3.textContent = data3;
+      cell4.textContent = data4;
+      cell5.textContent = data5;
+      cell6.textContent = data6;
+
+      // Add the cells to the new row
+      newRow.appendChild(cell2);
+      newRow.appendChild(cell3);
+      newRow.appendChild(cell4);
+      newRow.appendChild(cell5);
+      newRow.appendChild(cell6);
+
+      // Add the new row to the tbody
+      tbody.appendChild(newRow);
+    }
+  </script>
+
+  <!-- chart -->
+  <script>
+    function chartConfigGen(label, data, color) {
+      return {
+        type: "line",
+        data: {
+          labels: [
+            60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28,
+            26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0,
+          ],
+          datasets: [
+            {
+              label: label,
+              data: data,
+              borderColor: color,
+              tension: 0.1,
+            },
+          ],
+          options: {
+            responsive: true,
+          },
+        },
+        options: {
+          responsive: true,
+        },
+      };
+    }
+
+    const configTempCharts = chartConfigGen("Nhiệt độ", [25], "red");
+    const configHumiCharts = chartConfigGen("Độ ẩm", [50], "green");
+    const configCo2Charts = chartConfigGen("CO2", [1], "blue");
+    const configGasCharts = chartConfigGen("Gas", [0.4], "yellow");
+
+    const tempChart = new Chart(
+      document.getElementById("tempChart").getContext("2d"),
+      configTempCharts
+    );
+
+    const humiChart = new Chart(
+      document.getElementById("humiChart").getContext("2d"),
+      configHumiCharts
+    );
+
+    const co2Chart = new Chart(
+      document.getElementById("co2Chart").getContext("2d"),
+      configCo2Charts
+    );
+
+    const gasChart = new Chart(
+      document.getElementById("gasChart").getContext("2d"),
+      configGasCharts
+    );
+  </script>
+  <!-- update chart -->
+  <script>
+    function addData(chart, data) {
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(data);
+      });
+      chart.update();
+    }
+
+    function removeData(chart) {
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.shift();
+      });
+      chart.update();
+    }
+  </script>
+</body>
+
+</html>

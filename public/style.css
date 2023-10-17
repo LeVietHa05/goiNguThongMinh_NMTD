@@ -1,0 +1,57 @@
+
+header {
+    height: 120px;
+}
+
+.bcc-purle {
+  background: #2c045e;
+  color: #fff !important;
+}
+
+.bcc-purle2 {
+  background: #d84efb;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.bg-lightRed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.bg-lightRed2 {
+  background: #ec949b;
+  color: #721c24;
+}
+
+.bg-lightGreen {
+  background: #d4edda;
+  color: #155724;
+}
+.bg-lightGreen2 {
+  background: #aeeebd;
+  color: #155724;
+}
+
+.bg-lightBlue {
+  background: #cce5ff;
+  color: #04245e;
+}
+.bg-lightBlue2 {
+  background: #6cb5ec;
+  color: #04245e;
+}
+
+.bg-lightYellow {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.bg-lightYellow2 {
+  background: #f9d975;
+  color: #856404;
+}
+
+.gap-1 {
+  gap: 2px;
+}

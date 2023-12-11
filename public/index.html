@@ -74,6 +74,27 @@
   </div>
 
   <div class="p-4 text-center row">
+    <div class="col-5">
+      <div class="h5 gap-2">TURN BUZZER ON/OFF</div>
+      <button class="btn btn-success" id="btn_set_coi_on_js">ON</button>
+      <button class="btn btn-danger" id="btn_set_coi_off_js">OFF</button>
+    </div>
+    <div class="col-5">
+      <div class="h5 gap-2">TURN BUZZER ON/OFF</div>
+      <button class="btn btn-success" id="btn_set_buzzer_on_js">ON</button>
+      <button class="btn btn-danger" id="btn_set_buzzer_off_js">OFF</button>
+    </div>
+    <div class="col">
+      <div class="h5">Set Wake UP Time</div>
+      <div class="input-group mb-3">
+        <input type="time" class="form-control" />
+        <button class="btn btn-outline-secondary" type="button" id="btn_set_time_js">Set</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="p-4 text-center row">
     <div class="col">
       <table class="table table-sm table-success table-striped table-hover  table" style="margin: auto;">
         <caption class=" caption-top">Theo dõi chất lượng giấc ngủ</caption>
@@ -127,42 +148,52 @@
     const co2 = document.getElementById("co2");
     // const gas = document.getElementById("gas");
 
-    let data = {
-      clientID
-        :
-        "esp",
-      co2
-        :
-        null,
-      count1
-        :
-        "15",
-      count2
-        :
-        "47",
-      count3
-        :
-        "28",
-      dust
-        :
-        "0.00",
-      humi
-        :
-        "75.24",
-      isCoiOn
-        :
-        "0",
-      isTuiSuoiOn
-        :
-        "0",
-      temp
-        :
-        "27.23",
+    let control = {
+      isCoiOn: 0,
+      isTuiSuoiOn: 0,
+      hour: 0,
+      minute: 0
     }
+
     var socket = io();
     socket.on('connect', function () {
       console.log('Connected!');
     });
+
+    btn_set_coi_on_js.addEventListener("click", () => {
+      control.isCoiOn = 1;
+      console.log(control);
+      socket.emit("/web/control", control);
+    })
+
+    btn_set_coi_off_js.addEventListener("click", () => {
+      control.isCoiOn = 0;
+      console.log(control);
+      socket.emit("/web/control", control);
+    })
+
+    btn_set_buzzer_on_js.addEventListener("click", () => {
+      control.isTuiSuoiOn = 1;
+      console.log(control);
+      socket.emit("/web/control", control);
+    })
+
+    btn_set_buzzer_off_js.addEventListener("click", () => {
+      control.isTuiSuoiOn = 0;
+      console.log(control);
+      socket.emit("/web/control", control);
+    })
+
+    btn_set_time_js.addEventListener("click", () => {
+      let time = document.querySelector(".input-group.mb-3 input").value;
+      let timeArray = time.split(":");
+      if (timeArray.length != 2) return;
+      control.hour = parseInt(timeArray[0]);
+      control.minute = parseInt(timeArray[1]);
+      console.log(control);
+      socket.emit("/web/control", control);
+    })
+
 
     socket.on("/web/measure", (data) => {
       console.log(data);
@@ -192,7 +223,7 @@
       count1.innerText = data.count1;
       count2.innerText = data.count2;
       count3.innerText = data.count3;
-      
+
     });
 
     socket.on("/web/envir", (data) => {

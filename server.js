@@ -33,6 +33,16 @@ app.get("/chartData", (req, res) => {
   });
 });
 
+
+let count = {
+  count1: 0,
+  count2: 0,
+  count3: 0,
+  lastCount3: 0,
+  lastCount2: 0,
+  lastCount3: 0,
+}
+
 io.on("connection", (socket) => {
   info(
     "[" + socket.id + "] new connection",
@@ -46,9 +56,21 @@ io.on("connection", (socket) => {
 
   socket.on("/esp/measure", (data) => {
     log(`message from ${data.clientID} via socket id: ${socket.id}`);
+    if (count.lastCount1 != data.count1) {
+      count.count1 += data.count1 - count.lastCount1;
+    }
+    if (count.lastCount2 != data.count2) {
+      count.count2 += data.count2 - count.lastCount2;
+    }
+    if (count.lastCount3 != data.count3) {
+      count.count3 += data.count3 - count.lastCount3;
+    }
+    data.count1 = count.count1;
+    data.count2 = count.count2;
+    data.count3 = count.count3;
     socket.broadcast.emit("/web/measure", data);
   });
-  
+
   socket.on("/web/control", (data) => {
     log(`message from ${data.clientID} via socket id: ${socket.id}`);
     socket.broadcast.emit("/esp/control", data);

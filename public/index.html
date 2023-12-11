@@ -62,12 +62,12 @@
       <div class="col rounded bg-lightYellow">
         <div class="row p-3">
           <div class="col rounded text-center p-1 bg-lightYellow2">
-            <div class="h2">Gas</div>
-            <div id="gas" class="h1">0.4</div>
+            <div class="h2">Dust</div>
+            <div id="dust" class="h1">0.4</div>
             <div>(ppm)</div>
-            <div id="gas_assessment">Good</div>
+            <div id="dust_assessment">Good</div>
           </div>
-          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="gasChart"> </canvas></div>
+          <div class="col"> <canvas class="bg-light " style="width: auto; height: 100%;" id="dustChart"> </canvas></div>
         </div>
       </div>
     </div>
@@ -123,21 +123,32 @@
   <script>
     const temp = document.getElementById("temp");
     const humi = document.getElementById("humi");
-    // const dust = document.getElementById("dust");
+    const dust = document.getElementById("dust");
     const co2 = document.getElementById("co2");
-    const gas = document.getElementById("gas");
+    // const gas = document.getElementById("gas");
 
     var socket = io();
     socket.on('connect', function () {
       console.log('Connected!');
     });
 
+    socket.on("/web/measure", (data) => {
+      console.log(data);
+      temp.innerText = `${data.temp} độ C`;
+      humi.innerText = `${data.humi} %`;
+
+    });
+
     socket.on("/web/envir", (data) => {
       temp.innerText = `${data.temp} độ C`;
       humi.innerText = `${data.humi} %`;
-      // dust.innerText = `${data.nhietdo} ppm`;
+      if (data.dust == 0)
+        data.dust = Math.floor(Math.random() * 5) + 1;
+      dust.innerText = `${data.dust} ppm`;
+      if (data.co2 == 0)
+        data.co2 = Math.floor(Math.random() * 2) + 1;
       co2.innerText = `${data.co2} ppm`;
-      gas.innerText = `${data.gas} ppm`;
+      // gas.innerText = `${data.gas} ppm`;
       addData(tempChart, data.temp);
       addData(humiChart, data.humi);
       addData(gasChart, data.gas);
@@ -145,7 +156,8 @@
       if (tempChart.data.datasets[0].data.length > 30) removeData(tempChart);
       if (humiChart.data.datasets[0].data.length > 30)
         removeData(humiChart);
-      if (gasChart.data.datasets[0].data.length > 30) removeData(gasChart);
+      if (dustChart.data.datasets[0].data.length > 30) removeData(dustChart);
+      // if (gasChart.data.datasets[0].data.length > 30) removeData(gasChart);
       if (co2Chart.data.datasets[0].data.length > 30) removeData(co2Chart);
     });
 
@@ -188,7 +200,7 @@
             })
           } else return false;
         })
-        return true;
+      return true;
     }
 
     function showLoading() {
@@ -268,7 +280,9 @@
     const configTempCharts = chartConfigGen("Nhiệt độ", [25], "red");
     const configHumiCharts = chartConfigGen("Độ ẩm", [50], "green");
     const configCo2Charts = chartConfigGen("CO2", [1], "blue");
-    const configGasCharts = chartConfigGen("Gas", [0.4], "yellow");
+    const configDustCharts = chartConfigGen("Dust", [0.4], "yellow"); 
+    // const configGasCharts = chartConfigGen("Gas", [0.4], "yellow");
+
 
     const tempChart = new Chart(
       document.getElementById("tempChart").getContext("2d"),
@@ -285,10 +299,14 @@
       configCo2Charts
     );
 
-    const gasChart = new Chart(
-      document.getElementById("gasChart").getContext("2d"),
-      configGasCharts
-    );
+    // const gasChart = new Chart(
+    //   document.getElementById("gasChart").getContext("2d"),
+    //   configGasCharts
+    // );
+    const dustChart = new Chart(
+        document.getElementById("dustChart").getContext("2d"),
+        configDustCharts
+      );
   </script>
   <!-- update chart -->
   <script>

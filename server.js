@@ -26,10 +26,10 @@ app.get("/chartData", (req, res) => {
   fs.readFile("data.json", "utf8", (err, jsonString) => {
     if (err) {
       error("File read failed:", err);
-      return res.json({data: [], msg: "error"});
+      return res.json({ data: [], msg: "error" });
     }
     let dataJson = JSON.parse(jsonString);
-    res.json({data: dataJson.data, msg: "success"});
+    res.json({ data: dataJson.data, msg: "success" });
   });
 });
 
@@ -44,7 +44,16 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("/web/envir", data);
   });
 
+  socket.on("/esp/measure", (data) => {
+    log(`message from ${data.clientID} via socket id: ${socket.id}`);
+    socket.broadcast.emit("/web/measure", data);
+  });
   
+  socket.on("/web/control", (data) => {
+    log(`message from ${data.clientID} via socket id: ${socket.id}`);
+    socket.broadcast.emit("/esp/control", data);
+  });
+
   socket.on("/esp/sleep", (data) => {
     log(data)
     //add new data into data.json
@@ -54,7 +63,7 @@ io.on("connection", (socket) => {
      *  data:[{...},{...},{...}]
      * }
      */
-    
+
     fs.readFile("data.json", "utf8", (err, jsonString) => {
       if (err) {
         error("File read failed:", err);
@@ -85,8 +94,9 @@ io.on("connection", (socket) => {
   });
 });
 
+const PORT = process.env.PORT || 3000;
 //doi port khac di
-server.listen(3000, () => {
-  log("server is listening on port doi port di");
+server.listen(PORT, () => {
+  log("server is listening on : ", PORT);
 });
 

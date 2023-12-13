@@ -78,7 +78,7 @@
         <button class="btn btn-danger" id="btn_set_coi_off_js">OFF</button>
       </div>
       <div class="col">
-        <div class="h5 gap-2">TURN BUZZER ON/OFF</div>
+        <div class="h5 gap-2">TURN Tui Suoi ON/OFF</div>
         <button class="btn btn-success" id="btn_set_buzzer_on_js">ON</button>
         <button class="btn btn-danger" id="btn_set_buzzer_off_js">OFF</button>
       </div>
@@ -209,21 +209,22 @@
       // gas.innerText = `${data.gas} ppm`;
       addData(tempChart, data.temp);
       addData(humiChart, data.humi);
-      addData(gasChart, data.gas);
+      // addData(gasChart, data.gas);
+      addData(dustChart, data.gas);
       addData(co2Chart, data.co2);
       if (tempChart.data.datasets[0].data.length > 30) removeData(tempChart);
       if (humiChart.data.datasets[0].data.length > 30)
         removeData(humiChart);
-      if (dustC.data.datasets[0].data.length > 30) removeData(dustC);
+      if (dustChart.data.datasets[0].data.length > 30) removeData(dustChart);
       // if (gasChart.data.datasets[0].data.length > 30) removeData(gasChart);
       if (co2Chart.data.datasets[0].data.length > 30) removeData(co2Chart);
 
       cleanTable();
       showLoading();
       cleanTable();
-      count1.innerText = data.count1;
-      count2.innerText = data.count2;
-      count3.innerText = data.count3;
+      document.querySelectorAll("#count1").innerText = data.count1;
+      document.querySelectorAll("#count2").innerText = data.count2;
+      document.querySelectorAll("#count3").innerText = data.count3;
 
     });
 
@@ -244,7 +245,7 @@
       if (tempChart.data.datasets[0].data.length > 30) removeData(tempChart);
       if (humiChart.data.datasets[0].data.length > 30)
         removeData(humiChart);
-      if (dustC.data.datasets[0].data.length > 30) removeData(dustC);
+      if (dustChart.data.datasets[0].data.length > 30) removeData(dustChart);
       // if (gasChart.data.datasets[0].data.length > 30) removeData(gasChart);
       if (co2Chart.data.datasets[0].data.length > 30) removeData(co2Chart);
     });

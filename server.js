@@ -38,7 +38,7 @@ let count = {
   count1: 0,
   count2: 0,
   count3: 0,
-  lastCount3: 0,
+  lastCount1: 0,
   lastCount2: 0,
   lastCount3: 0,
 }

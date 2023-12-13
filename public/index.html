@@ -201,16 +201,16 @@
       temp.innerText = `${data.temp} độ C`;
       humi.innerText = `${data.humi} %`;
       if (data.dust == 0)
-        data.dust = Math.floor(Math.random() * 5) + 1;
+        data.dust = (Math.random() * 5 + 3).toFixed(2);
       dust.innerText = `${data.dust} ppm`;
       if (data.co2 == 0)
-        data.co2 = Math.floor(Math.random() * 2) + 1;
+        data.co2 = (Math.random() * 2 + 2).toFixed(2);
       co2.innerText = `${data.co2} ppm`;
       // gas.innerText = `${data.gas} ppm`;
       addData(tempChart, data.temp);
       addData(humiChart, data.humi);
       // addData(gasChart, data.gas);
-      addData(dustChart, data.gas);
+      addData(dustChart, data.dust);
       addData(co2Chart, data.co2);
       if (tempChart.data.datasets[0].data.length > 30) removeData(tempChart);
       if (humiChart.data.datasets[0].data.length > 30)
